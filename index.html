@@ -4,25 +4,19 @@
 		<title>Time Management</title>
 		<script src="https://unpkg.com/vue"></script>
 		<style>
-			.startTimes {
-				background-color: #c6e8ff
-				flex: 1;
-			}
-			.endTimes {
-				background-color: #c6e8ff
-				flex: 1;
-			}
-			.desc {
-				background-color: #c6e8ff
-				flex: 2;
-			}
-			.schedule, .addevents, .rNewEvent {
+			.eventType, .rNewEvent {
 				display: flex;
 				justify-content: center;
 				align-items: center;
 			}
-			.startTimes div, .endTimes div, .description div {
-				padding: 8px;
+			.wrapper {
+				display: flex;
+				justify-content: center;
+			}
+			.schedule-item {
+				display: grid;
+				grid-template-columns: 1fr 1fr 2fr;
+				grid-gap: 8px;
 			}
 		</style>
 	</head>
@@ -31,19 +25,17 @@
 			<h1>Today's Schedule</h1>
 		</center>
 		<div id="app">
-			<div class="schedule">
-				<div class="startTimes">
-					<div v-for="startTime in startTime">{{ startTime }}</div>
+			<table>
+				<div class="wrapper">
+					<div class="schedule-item" v-for="item in events">
+						<div>{{ item.startTime }}</div>
+						<div>{{ item.endTime }}</div>
+						<div>{{ item.desc }}</div>
+					</div>
 				</div>
-				<div class="endTimes">
-					<div v-for="endTime in endTime">{{ endTime }}</div>
-				</div>
-				<div class="description">
-					<div v-for="desc in description">{{ desc }}</div>
-				</div>
-			</div>
+			</table>
 			<p></p>
-			<div class="addevents">
+			<div class="eventType">
 				<select v-model="priority">
 					<option disabled value="">Please select one</option>
 					<option>Required Time</option>
@@ -51,56 +43,38 @@
 					<option>Due Date</option>
 				</select>
 			</div>
-			<div class="rNewEvent">
-				<div v-if="priority == 'Required Time'">
-					<p>works!</p>
-				</div>
+			<div class="rNewEvent" v-if="priority == 'Required Time'">
+				<p></p>
+				<input v-model="describe" placeholder="Description">
+				<input v-model="start" placeholder="Start Time">
+				<input v-model="end" placeholder="End Time">
+				<button v-on:click="add_item()">Submit</button>
 			</div>
 		</div>
 	</body>
 	<script>
 		var schedule = {
-			startTimes: [
-				"12:00AM",
-				"7:00AM",
-				"7:30AM",
-				"8:00AM",
-				"2:30PM",
-				"3:00PM",
-				"5:00PM",
-				"9:00PM",
-			],
-			endTimes: [
-				"7:00AM",
-				"7:30AM",
-				"8:00AM",
-				"2:30PM",
-				"3:00PM",
-				"5:00PM",
-				"9:00PM",
-				"12:00PM",
-			],
-			desc: [
-				"Sleeping.",
-				"Getting ready for school.",
-				"Commuting.",
-				"School.",
-				"Commuting.",
-				"Homework.",
-				"Free time.",
-				"Sleeping.",
-			],
+
+
 		}
 		var app = new Vue({
 			el: "#app",
 			data: {
-				startTime: schedule.startTimes,
-				endTime: schedule.endTimes,
-				description: schedule.desc,
-				priority: ''
+				describe: "",
+				start: "",
+				end: "",
+				priority: "",
+				events: [],
 			},
 			methods: {
-
+				add_item: function(){
+					var item = {
+						startTime: this.start,
+						endTime: this.end,
+						desc: this.describe,
+					};
+					this.events.push(item);
+				}
 			}
 		});
 	</script>
