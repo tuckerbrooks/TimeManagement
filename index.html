@@ -15,8 +15,8 @@
 			}
 			.schedule-item {
 				display: grid;
-				grid-template-columns: 1fr 1fr 2fr;
-				grid-gap: 8px;
+				grid-template-columns: 1fr 1fr 1fr;
+				grid-gap: 16px;
 			}
 		</style>
 	</head>
@@ -25,15 +25,15 @@
 			<h1>Today's Schedule</h1>
 		</center>
 		<div id="app">
-			<table>
-				<div class="wrapper">
-					<div class="schedule-item" v-for="item in events">
+			<div class="wrapper">
+				<div class="schedule-item">
+					<template v-for="item in events">
 						<div>{{ item.startTime }}</div>
 						<div>{{ item.endTime }}</div>
 						<div>{{ item.desc }}</div>
-					</div>
+					</template>
 				</div>
-			</table>
+			</div>
 			<p></p>
 			<div class="eventType">
 				<select v-model="priority">
