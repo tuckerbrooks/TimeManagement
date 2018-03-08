@@ -13,7 +13,7 @@
 				display: flex;
 				justify-content: center;
 			}
-			.rNewEvent {
+			.rNewEvent, .fNewEvent {
 				display: grid;
 				grid-template-columns: 1fr;
 				grid-gap: 16px;
@@ -34,7 +34,7 @@
 		<div id="app">
 			<div class="wrapper">
 				<div class="schedule-item">
-					<template v-for="item in events">
+					<template v-for="item in reqEvents">
 						<div>{{ item.startTime }}</div>
 						<div>{{ item.endTime }}</div>
 						<div>{{ item.desc }}</div>
@@ -68,12 +68,12 @@
 					<div>&nbsp;:&nbsp;</div>
 					<select v-model="startMin">
 						<option disabled value=""></option>
-						<template v-for="n in 59">
-							<template v-if="n < 10">
+						<template v-for="n in 60">
+							<template v-if="n < 11">
 								<option>{{ '0' + (n - 1) }}</option>
 							</template>
 							<template v-else>
-								<option>{{ n }}</option>
+								<option>{{ (n - 1) }}</option>
 							</template>
 						</template>
 					</select>
@@ -95,12 +95,12 @@
 					<div>&nbsp;:&nbsp;</div>
 					<select v-model="endMin">
 						<option disabled value=""></option>
-						<template v-for="n in 59">
-							<template v-if="n < 10">
+						<template v-for="n in 60">
+							<template v-if="n < 11">
 								<option>{{ '0' + (n - 1) }}</option>
 							</template>
 							<template v-else>
-								<option>{{ n }}</option>
+								<option>{{ (n - 1) }}</option>
 							</template>
 						</template>
 					</select>
@@ -112,7 +112,29 @@
 					</select>
 				</div>
 				<div class="wrapper">
-					<button v-on:click="add_item()">Submit</button>
+					<button v-on:click="add_req()">Submit</button>
+				</div>
+			</div>
+			<div class="fNewEvent" v-if="priority == 'Flexible'">
+				<div class="wrapper">
+					<div>Description: &nbsp;</div>
+					<input v-model="describe" placeholder="Description">
+				</div>
+				<div class="wrapper">
+					<div>Hours: &nbsp;</div>
+					<select v-model="hours">
+						<template v-for="n in 13">
+							<option>{{ (n - 1) }}</option>
+						</template>
+					</select>
+				</div>
+				<div class="wrapper">
+					<div>Minutes: &nbsp;</div>
+					<select v-model="minutes">
+						<template v-for="n in 60">
+							<option>{{ (n - 1) }}</option>
+						</template>
+					</select>
 				</div>
 			</div>
 		</div>
@@ -131,11 +153,13 @@
 				start: "",
 				end: "",
 				priority: "",
-				events: [],
+				reqEvents: [],
+				flexEvents: [],
+				dueEvents: [],
 				currentID: 0,
 			},
 			methods: {
-				add_item: function(){
+				add_req: function(){
 					this.start = this.startHour + ':' + this.startMin + ' ' + this.startMOA;
 					this.end = this.endHour + ':' + this.endMin + ' ' + this.endMOA;
 					var item = {
@@ -145,10 +169,10 @@
 						desc: this.describe,
 					}
 					this.currentID += 1;
-					this.events.push(item);
+					this.reqEvents.push(item);
 				},
 				remove_item: function(itemID){
-          			this.events = this.events.filter((item) => { return item.itemID !== itemID });
+          			this.reqEvents = this.reqEvents.filter((item) => { return item.itemID !== itemID });
 				}
 			}	
 		});
