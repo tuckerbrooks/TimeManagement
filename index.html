@@ -13,9 +13,16 @@
 				display: flex;
 				justify-content: center;
 			}
+			.rNewEvent {
+				display: grid;
+				grid-template-columns: 1fr;
+				grid-gap: 16px;
+				justify-content: center;
+				align-items: center;
+			}
 			.schedule-item {
 				display: grid;
-				grid-template-columns: 1fr 1fr 1fr;
+				grid-template-columns: 1fr 1fr 1fr 1fr;
 				grid-gap: 16px;
 			}
 		</style>
@@ -31,6 +38,7 @@
 						<div>{{ item.startTime }}</div>
 						<div>{{ item.endTime }}</div>
 						<div>{{ item.desc }}</div>
+						<button @click="remove_item(item.itemID)">Delete</button>
 					</template>
 				</div>
 			</div>
@@ -43,39 +51,106 @@
 					<option>Due Date</option>
 				</select>
 			</div>
+			<p></p>
 			<div class="rNewEvent" v-if="priority == 'Required Time'">
-				<p></p>
-				<input v-model="describe" placeholder="Description">
-				<input v-model="start" placeholder="Start Time">
-				<input v-model="end" placeholder="End Time">
-				<button v-on:click="add_item()">Submit</button>
+				<div class="wrapper">
+					<div>Description: &nbsp;</div>
+					<input v-model="describe" placeholder="Description">
+				</div>
+				<div class="wrapper">
+					<div>Start Time: &nbsp;</div>
+					<select v-model="startHour">
+						<option disabled value=""></option>
+							<template v-for="n in 12">
+								<option>{{ n }}</option>
+							</template>
+					</select>
+					<div>&nbsp;:&nbsp;</div>
+					<select v-model="startMin">
+						<option disabled value=""></option>
+						<template v-for="n in 59">
+							<template v-if="n < 10">
+								<option>{{ '0' + (n - 1) }}</option>
+							</template>
+							<template v-else>
+								<option>{{ n }}</option>
+							</template>
+						</template>
+					</select>
+					<div>&nbsp;</div>
+					<select v-model="startMOA">
+						<option disabled value=""></option>
+						<option>AM</option>
+						<option>PM</option>
+					</select>
+				</div>
+				<div class="wrapper">
+					<div>End Time: &nbsp;</div>
+					<select v-model="endHour">
+						<option disabled value=""></option>
+							<template v-for="n in 12">
+								<option>{{ n }}</option>
+							</template>
+					</select>
+					<div>&nbsp;:&nbsp;</div>
+					<select v-model="endMin">
+						<option disabled value=""></option>
+						<template v-for="n in 59">
+							<template v-if="n < 10">
+								<option>{{ '0' + (n - 1) }}</option>
+							</template>
+							<template v-else>
+								<option>{{ n }}</option>
+							</template>
+						</template>
+					</select>
+					<div>&nbsp;</div>
+					<select v-model="endMOA">
+						<option disabled value=""></option>
+						<option>AM</option>
+						<option>PM</option>
+					</select>
+				</div>
+				<div class="wrapper">
+					<button v-on:click="add_item()">Submit</button>
+				</div>
 			</div>
 		</div>
 	</body>
 	<script>
-		var schedule = {
-
-
-		}
 		var app = new Vue({
 			el: "#app",
 			data: {
 				describe: "",
+				startHour: "",
+				startMin: "",
+				startMOA: "",
+				endHour: "",
+				endMin: "",
+				endMOA: "",
 				start: "",
 				end: "",
 				priority: "",
 				events: [],
+				currentID: 0,
 			},
 			methods: {
 				add_item: function(){
+					this.start = this.startHour + ':' + this.startMin + ' ' + this.startMOA;
+					this.end = this.endHour + ':' + this.endMin + ' ' + this.endMOA;
 					var item = {
+						itemID: this.currentID + 1,
 						startTime: this.start,
 						endTime: this.end,
 						desc: this.describe,
-					};
+					}
+					this.currentID += 1;
 					this.events.push(item);
+				},
+				remove_item: function(itemID){
+          			this.events = this.events.filter((item) => { return item.itemID !== itemID });
 				}
-			}
+			}	
 		});
 	</script>
 </html>
