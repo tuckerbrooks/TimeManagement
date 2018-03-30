@@ -34,7 +34,7 @@
 		<div id="app">
 			<div class="wrapper">
 				<div class="schedule-item">
-					<template v-for="item in reqEvents">
+					<template v-for="item in events">
 						<div>{{ item.startTime }}</div>
 						<div>{{ item.endTime }}</div>
 						<div>{{ item.desc }}</div>
@@ -153,6 +153,7 @@
 				start: "",
 				end: "",
 				priority: "",
+				events: [],
 				reqEvents: [],
 				flexEvents: [],
 				dueEvents: [],
@@ -160,8 +161,20 @@
 			},
 			methods: {
 				add_req: function(){
-					this.start = this.startHour + ':' + this.startMin + ' ' + this.startMOA;
-					this.end = this.endHour + ':' + this.endMin + ' ' + this.endMOA;
+					if (this.startMOA == "PM" && this.startHour != 12){
+						this.startHour = this.startHour + 12
+					} else if (this.startMOA == "AM" && this.startHour == 12){
+						this.startHour = 0
+					}
+					if (this.endMOA == "PM" && this.endHour != 12){
+						this.endHour = this.endHour + 12
+					} else if (this.endMOA == "AM" && this.endHour == 12){
+						this.endHour = 0
+					}
+					this.day = new Date();
+					this.start = new Date(this.day.getYear(), this.day.getMonth(), this.day.getDate(), this.startHour, this.startMin);
+					this.end = new Date(this.day.getYear(), this.day.getMonth(), this.day.getDate(), this.endHour, this.endMin);
+					this.start;
 					var item = {
 						itemID: this.currentID + 1,
 						startTime: this.start,
@@ -170,9 +183,40 @@
 					}
 					this.currentID += 1;
 					this.reqEvents.push(item);
+					this.listItems();
+				},
+				listItems: function(){
+					for (this.event in this.reqEvents){
+						this.startTime = this.event.startTime;
+						if (this.startTime.getHours() == 0){
+							this.start = 12 + ":" + this.startTime.getMinutes() + " AM"; 
+						} else if (this.event.startTime.getHours() > 12){
+							this.start = (this.startTime.getHours() + 12)  + ":" + this.startTime.getMinutes() + " AM";
+						} else if (this.startTime.getHours() == 12){
+							this.start = 12 + ":" + this.startTime.getMinutes() + " PM";
+						} else {
+							this.start = this.startTime.getHours() + ":" + this.startTime.getMinutes() + " AM";
+						}
+						if (this.event.endTime.getHours() == 0){
+							this.end = 12 + ":" + this.event.endTime.getMinutes() + " AM";
+						} else if (this.event.endTime.getHours() > 12){
+							this.end = (this.event.endTime.getHours() + 12)  + ":" + this.event.endTime.getMinutes() + " AM";
+						} else if (this.event.endTime.getHours() == 12){
+							this.end = 12 + ":" + this.event.endTime.getHours() + " PM";
+						} else {
+							this.end = this.event.endTime.getHours() + ":" + this.event.endTime.getMinutes() + " AM";
+						}
+						var item = {
+							itemID: this.event.itemID,
+							startTime: this.start,
+							endTime: this.end,
+							desc: this.event.desc,
+						}
+						this.events.push(item);
+					}
 				},
 				remove_item: function(itemID){
-          			this.reqEvents = this.reqEvents.filter((item) => { return item.itemID !== itemID });
+          			this.events = this.events.filter((item) => { return item.itemID !== itemID });
 				}
 			}	
 		});
