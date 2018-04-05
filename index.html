@@ -158,23 +158,24 @@
 				flexEvents: [],
 				dueEvents: [],
 				currentID: 0,
+				startTime: "",
+				endTime: "",
 			},
 			methods: {
 				add_req: function(){
 					if (this.startMOA == "PM" && this.startHour != 12){
-						this.startHour = this.startHour + 12
+						this.startHour = parseInt(this.startHour) + parseInt(12)
 					} else if (this.startMOA == "AM" && this.startHour == 12){
-						this.startHour = 0
+						this.startHour = 0;
 					}
 					if (this.endMOA == "PM" && this.endHour != 12){
-						this.endHour = this.endHour + 12
+						this.endHour = parseInt(this.endHour) + parseInt(12)
 					} else if (this.endMOA == "AM" && this.endHour == 12){
-						this.endHour = 0
+						this.endHour = 0;
 					}
-					this.day = new Date();
-					this.start = new Date(this.day.getYear(), this.day.getMonth(), this.day.getDate(), this.startHour, this.startMin);
-					this.end = new Date(this.day.getYear(), this.day.getMonth(), this.day.getDate(), this.endHour, this.endMin);
-					this.start;
+					day = new Date();
+					this.start = new Date(day.getFullYear(), day.getMonth(), day.getDate(), this.startHour, this.startMin);
+					this.end = new Date(day.getFullYear(), day.getMonth(), day.getDate(), this.endHour, this.endMin);
 					var item = {
 						itemID: this.currentID + 1,
 						startTime: this.start,
@@ -186,31 +187,67 @@
 					this.listItems();
 				},
 				listItems: function(){
-					for (this.event in this.reqEvents){
-						this.startTime = this.event.startTime;
+					for (eventKey in this.reqEvents){
+						var event = this.reqEvents[eventKey];
+						this.startTime = event.startTime;
+						this.endTime = event.endTime;
+						this.start = this.startTime + this.startTime.getTimezoneOffset();
+						this.end = this.endTime + this.endTime.getTimezoneOffset();
 						if (this.startTime.getHours() == 0){
-							this.start = 12 + ":" + this.startTime.getMinutes() + " AM"; 
-						} else if (this.event.startTime.getHours() > 12){
-							this.start = (this.startTime.getHours() + 12)  + ":" + this.startTime.getMinutes() + " AM";
+							if (this.startTime.getMinutes() < 10){
+								this.start = 12 + ":0" + this.startTime.getMinutes() + " AM"; 
+							} else {
+								this.start = 12 + ":" + this.startTime.getMinutes() + " AM"; 
+							}
+						} else if (this.startTime.getHours() > 12){
+							if (this.startTime.getMinutes() < 10){
+								this.start = (this.startTime.getHours() - 12)  + ":0" + this.startTime.getMinutes() + " PM";
+							} else {
+								this.start = (this.startTime.getHours() - 12)  + ":" + this.startTime.getMinutes() + " PM";
+							}
 						} else if (this.startTime.getHours() == 12){
-							this.start = 12 + ":" + this.startTime.getMinutes() + " PM";
+							if (this.startTime.getMinutes() < 10){
+								this.start = 12 + ":0" + this.startTime.getMinutes() + " PM";
+							} else {
+								this.start = 12 + ":" + this.startTime.getMinutes() + " PM";
+							}
 						} else {
-							this.start = this.startTime.getHours() + ":" + this.startTime.getMinutes() + " AM";
+							if (this.startTime.getMinutes() < 10){
+								this.start = this.startTime.getHours() + ":0" + this.startTime.getMinutes() + " AM";
+							} else {
+								this.start = this.startTime.getHours() + ":" + this.startTime.getMinutes() + " AM";
+							}
 						}
-						if (this.event.endTime.getHours() == 0){
-							this.end = 12 + ":" + this.event.endTime.getMinutes() + " AM";
-						} else if (this.event.endTime.getHours() > 12){
-							this.end = (this.event.endTime.getHours() + 12)  + ":" + this.event.endTime.getMinutes() + " AM";
-						} else if (this.event.endTime.getHours() == 12){
-							this.end = 12 + ":" + this.event.endTime.getHours() + " PM";
+						if (this.endTime.getHours() == 0){
+							if (this.endTime.getMinutes() < 10){
+								this.end = 12 + ":0" + this.endTime.getMinutes() + " AM"; 
+							} else {
+								this.end = 12 + ":" + this.endTime.getMinutes() + " AM"; 
+							}
+						} else if (this.endTime.getHours() > 12){
+							if (this.endTime.getMinutes() < 10){
+								this.end = (this.endTime.getHours() - 12)  + ":0" + this.endTime.getMinutes() + " PM";
+							} else {
+								this.end = (this.endTime.getHours() - 12)  + ":" + this.endTime.getMinutes() + " PM";
+							}
+						} else if (this.endTime.getHours() == 12){
+							if (this.endTime.getMinutes() < 10){
+								this.end = 12 + ":0" + this.endTime.getMinutes() + " PM";
+							} else {
+								this.end = 12 + ":" + this.endTime.getMinutes() + " PM";
+							}
 						} else {
-							this.end = this.event.endTime.getHours() + ":" + this.event.endTime.getMinutes() + " AM";
+							if (this.endTime.getMinutes() < 10){
+								this.end = this.endTime.getHours() + ":0" + this.endTime.getMinutes() + " AM";
+							} else {
+								this.end = this.endTime.getHours() + ":" + this.endTime.getMinutes() + " AM";
+							}
 						}
 						var item = {
-							itemID: this.event.itemID,
+							itemID: event.itemID,
 							startTime: this.start,
 							endTime: this.end,
-							desc: this.event.desc,
+							desc: event.desc,
 						}
 						this.events.push(item);
 					}
