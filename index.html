@@ -34,7 +34,7 @@
 		<div id="app">
 			<div class="wrapper">
 				<div class="schedule-item">
-					<template v-for="item in events">
+					<template v-for="item in eventsText">
 						<div>{{ item.startTime }}</div>
 						<div>{{ item.endTime }}</div>
 						<div>{{ item.desc }}</div>
@@ -136,6 +136,9 @@
 						</template>
 					</select>
 				</div>
+				<div class="wrapper">
+					<button v-on:click="add_flex()">Submit</button>
+				</div>
 			</div>
 		</div>
 	</body>
@@ -153,13 +156,16 @@
 				start: "",
 				end: "",
 				priority: "",
+				eventsText: [],
 				events: [],
-				reqEvents: [],
+				sortedEvents: [],
 				flexEvents: [],
 				dueEvents: [],
 				currentID: 0,
 				startTime: "",
 				endTime: "",
+				minutes: "",
+				hours: "",
 			},
 			methods: {
 				add_req: function(){
@@ -183,12 +189,21 @@
 						desc: this.describe,
 					}
 					this.currentID += 1;
-					this.reqEvents.push(item);
+					this.events.push(item);
 					this.listItems();
 				},
+				add_flex: function(){
+					timeInMinutes = parseInt(this.minutes) + (parseInt(this.hours) * parseInt(60));
+				},
 				listItems: function(){
-					for (eventKey in this.reqEvents){
-						var event = this.reqEvents[eventKey];
+					this.events.sort(function(a, b) {
+    					var timeInMinutesA = parseInt(a.startTime.getHours()) + (parseInt(a.startTime.getMinutes()) * parseInt(60));
+    					var timeInMinutesB = parseInt(b.startTime.getHours()) + (parseInt(b.startTime.getMinutes()) * parseInt(60));
+    					return timeInMinutesA - timeInMinutesB;
+					});
+					this.eventsText = [];
+					for (eventKey in this.events){
+						var event = this.events[eventKey];
 						this.startTime = event.startTime;
 						this.endTime = event.endTime;
 						this.start = this.startTime + this.startTime.getTimezoneOffset();
@@ -249,11 +264,12 @@
 							endTime: this.end,
 							desc: event.desc,
 						}
-						this.events.push(item);
+						this.eventsText.push(item);
 					}
 				},
 				remove_item: function(itemID){
-          			this.events = this.events.filter((item) => { return item.itemID !== itemID });
+					this.events = this.events.filter((item) => { return item.itemID !== itemID });
+          			this.eventsText = this.eventsText.filter((item) => { return item.itemID !== itemID });
 				}
 			}	
 		});
