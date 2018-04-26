@@ -158,7 +158,6 @@
 				priority: "",
 				eventsText: [],
 				events: [],
-				sortedEvents: [],
 				flexEvents: [],
 				dueEvents: [],
 				currentID: 0,
@@ -194,13 +193,45 @@
 				},
 				add_flex: function(){
 					timeInMinutes = parseInt(this.minutes) + (parseInt(this.hours) * parseInt(60));
+					var ending;
+					var item;
+					for (i = 0; i < this.events.length - 1; i++){
+						var a = this.events[i];
+						var b = this.events[i + 1];
+						var aInMinutes = parseInt(a.endTime.getMinutes()) + (parseInt(a.endTime.getHours()) * parseInt(60));
+						var bInMinutes = parseInt(b.startTime.getMinutes()) + (parseInt(b.startTime.getHours()) * parseInt(60));
+						ending = new Date(a.endTime.getTime() + timeInMinutes*60000);
+						difference = (bInMinutes - aInMinutes);
+						if (difference >= timeInMinutes){
+							item = {
+								itemID: this.currentID + 1,
+								startTime: a.endTime,
+								endTime: ending,
+								desc: this.describe,
+							}
+							break;
+						}
+					}
+					if (item == undefined){
+						ending = new Date(this.events[this.events.length - 1].endTime.getTime() + timeInMinutes*60000);
+						item = {
+							itemID: this.currentID + 1,
+							startTime: this.events[this.events.length - 1].endTime,
+							endTime: ending,
+							desc: this.describe,
+						}
+					}
+					this.currentID += 1;
+					this.events.push(item);
+					this.listItems();
 				},
 				listItems: function(){
 					this.events.sort(function(a, b) {
-    					var timeInMinutesA = parseInt(a.startTime.getHours()) + (parseInt(a.startTime.getMinutes()) * parseInt(60));
-    					var timeInMinutesB = parseInt(b.startTime.getHours()) + (parseInt(b.startTime.getMinutes()) * parseInt(60));
+    					var timeInMinutesA = parseInt(a.startTime.getHours()) * parseInt(60) + (parseInt(a.startTime.getMinutes()));
+    					var timeInMinutesB = parseInt(b.startTime.getHours()) * parseInt(60) + (parseInt(b.startTime.getMinutes()));
     					return timeInMinutesA - timeInMinutesB;
 					});
+					this.autoRemoveItem();
 					this.eventsText = [];
 					for (eventKey in this.events){
 						var event = this.events[eventKey];
@@ -270,6 +301,20 @@
 				remove_item: function(itemID){
 					this.events = this.events.filter((item) => { return item.itemID !== itemID });
           			this.eventsText = this.eventsText.filter((item) => { return item.itemID !== itemID });
+				},
+				autoRemoveItem: function(){
+					var list = [];
+					var now = new Date();
+					for (eventKey in this.events){
+						var event = this.events[eventKey];
+						if (event.endTime < now){
+							list.push(event.itemID);
+						}
+					}
+					for (listKey in list){
+						var item = list[listKey];
+						this.remove_item(item);
+					}
 				}
 			}	
 		});
