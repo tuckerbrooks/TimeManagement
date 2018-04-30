@@ -212,11 +212,12 @@
 							break;
 						}
 					}
-					if (item == undefined){
-						ending = new Date(this.events[this.events.length - 1].endTime.getTime() + timeInMinutes*60000);
+					if (this.events.length == 0){
+						var starting = new Date();
+						ending = new Date(starting.getTime() + timeInMinutes*60000);
 						item = {
 							itemID: this.currentID + 1,
-							startTime: this.events[this.events.length - 1].endTime,
+							startTime: starting,
 							endTime: ending,
 							desc: this.describe,
 						}
