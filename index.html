@@ -165,6 +165,7 @@
 				endTime: "",
 				minutes: "",
 				hours: "",
+				flex: [],
 			},
 			methods: {
 				add_req: function(){
@@ -186,44 +187,21 @@
 						startTime: this.start,
 						endTime: this.end,
 						desc: this.describe,
+						itemType: "r",
 					}
 					this.currentID += 1;
 					this.events.push(item);
+					this.shuffleFlex();
 					this.listItems();
 				},
 				add_flex: function(){
-					timeInMinutes = parseInt(this.minutes) + (parseInt(this.hours) * parseInt(60));
-					var ending;
-					var item;
-					for (i = 0; i < this.events.length - 1; i++){
-						var a = this.events[i];
-						var b = this.events[i + 1];
-						var aInMinutes = parseInt(a.endTime.getMinutes()) + (parseInt(a.endTime.getHours()) * parseInt(60));
-						var bInMinutes = parseInt(b.startTime.getMinutes()) + (parseInt(b.startTime.getHours()) * parseInt(60));
-						ending = new Date(a.endTime.getTime() + timeInMinutes*60000);
-						difference = (bInMinutes - aInMinutes);
-						if (difference >= timeInMinutes){
-							item = {
-								itemID: this.currentID + 1,
-								startTime: a.endTime,
-								endTime: ending,
-								desc: this.describe,
-							}
-							break;
-						}
+					var flexTime = {
+						hours: this.hours,
+						minutes: this.minutes,
+						desc: this.describe,
 					}
-					if (this.events.length == 0){
-						var starting = new Date();
-						ending = new Date(starting.getTime() + timeInMinutes*60000);
-						item = {
-							itemID: this.currentID + 1,
-							startTime: starting,
-							endTime: ending,
-							desc: this.describe,
-						}
-					}
-					this.currentID += 1;
-					this.events.push(item);
+					this.flex.push(flexTime);
+					this.sortFlex(this.hours, this.minutes, this.describe);
 					this.listItems();
 				},
 				listItems: function(){
@@ -295,8 +273,64 @@
 							startTime: this.start,
 							endTime: this.end,
 							desc: event.desc,
+							itemType: event.itemType,
 						}
 						this.eventsText.push(item);
+					}
+				},
+				sortFlex: function(hours, minutes, desc){
+					timeInMinutes = parseInt(minutes) + (parseInt(hours) * parseInt(60));
+					var ending;
+					var item;
+					this.events.splice(0, 0, ({ startTime: new Date(), endTime: new Date() }));
+					for (i = 0; i < this.events.length - 1; i++){
+						var a = this.events[i];
+						var b = this.events[i + 1];
+						var aInMinutes = parseInt(a.endTime.getMinutes()) + (parseInt(a.endTime.getHours()) * parseInt(60));
+						var bInMinutes = parseInt(b.startTime.getMinutes()) + (parseInt(b.startTime.getHours()) * parseInt(60));
+						ending = new Date(a.endTime.getTime() + timeInMinutes*60000);
+						difference = (bInMinutes - aInMinutes);
+						if (difference >= timeInMinutes){
+							item = {
+								itemID: this.currentID + 1,
+								startTime: a.endTime,
+								endTime: ending,
+								desc: desc,
+								itemType: "f",
+							}
+							break;
+						}
+					}
+					this.events.splice(0, 1);
+					if (this.events.length == 0){
+						var starting = new Date();
+						ending = new Date(starting.getTime() + timeInMinutes*60000);
+						item = {
+							itemID: this.currentID + 1,
+							startTime: starting,
+							endTime: ending,
+							desc: desc,
+							itemType: "f",
+						}
+					}
+					if (item == undefined){
+						ending = new Date(this.events[this.events.length - 1].endTime.getTime() + timeInMinutes*60000);
+						item = {
+							itemID: this.currentID + 1,
+							startTime: this.events[this.events.length - 1].endTime,
+							endTime: ending,
+							desc: desc,
+							itemType: "f",
+						}
+					}
+					this.currentID += 1;
+					this.events.push(item);
+				},
+				shuffleFlex: function(){
+					this.events = this.events.filter((item) => { return item.itemType !== "f" });
+					for (eventKey in this.flex){
+						var event = this.flex[eventKey];
+						this.sortFlex(event.hours, event.minutes, event.desc);
 					}
 				},
 				remove_item: function(itemID){
