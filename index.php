@@ -1,7 +1,6 @@
 <?php
 // Initialize the session
-session_start();
- 
+session_start(); 
 // If session variable is not set it will redirect to login page
 if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 	header("location: login.php");
@@ -587,6 +586,21 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 						}
 					}
 				},
+				pushEvent: function(id, start, end, desc, type){
+					$.post("upload.php",
+			    {
+					eventID: id,
+					startTime: start,
+					endTime: end,
+					description: desc,
+					itemType: type,
+			    },
+			    function(data, status){
+			        document.getElementById("saveWarningText").innerHTML = data;
+			        $( "#saveWarningText" ).fadeIn(100);
+			        setTimeout(function(){ $( "#saveWarningText" ).fadeOut(100); }, 3000);
+			    });
+				}
 				shuffleFlex: function(){
 					this.events = this.events.filter((item) => { return item.itemType !== "f" });
 					for (eventKey in this.flex){
