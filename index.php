@@ -47,6 +47,7 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 		<div class="topright">
 			<a href="logout.php">Logout</a>
 		</div>
+		<div id="erorTxtDIVNaYME"></div>
 		<center>
 			<h1>Today's Schedule</h1>
 		</center>
@@ -389,6 +390,7 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 					}
 					this.currentID += 1;
 					this.events.push(item);
+					this.pushEvent(item.itemID, item.startTime, item.endTime, item.desc, item.itemType);
 					this.shuffleFlex();
 					this.listItems();
 				},
@@ -587,20 +589,10 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 					}
 				},
 				pushEvent: function(id, start, end, desc, type){
-					$.post("upload.php",
-			    {
-					eventID: id,
-					startTime: start,
-					endTime: end,
-					description: desc,
-					itemType: type,
-			    },
-			    function(data, status){
-			        document.getElementById("saveWarningText").innerHTML = data;
-			        $( "#saveWarningText" ).fadeIn(100);
-			        setTimeout(function(){ $( "#saveWarningText" ).fadeOut(100); }, 3000);
-			    });
-				}
+					var event = {eventID: id, startTime: start.getTime(), endTime: end.getTime(), description: desc, itemType: type};
+					console.log(event);
+					$.post("upload.php", event);
+				},
 				shuffleFlex: function(){
 					this.events = this.events.filter((item) => { return item.itemType !== "f" });
 					for (eventKey in this.flex){

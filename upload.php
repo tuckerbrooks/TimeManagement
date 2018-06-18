@@ -1,23 +1,28 @@
 <?php
 session_start();
+ini_set('display_errors', '1');
 
 require_once 'config.php';
 
-$username = mysqli_real_escape_string($conn, $_SESSION['username']);
-$userID = "SELECT id FROM users WHERE username = '$username'";
-$eventID = mysqli_real_escape_string($conn, $_POST['eventID']);
-$startTime = mysqli_real_escape_string($conn, $_POST['startTime']);
-$endTime = mysqli_real_escape_string($conn, $_POST['endTime']);
-$description = mysqli_real_escape_string($conn, $_POST['description']);
-$itemType = mysqli_real_escape_string($conn, $_POST['itemType']);
+$username = $_SESSION['username'];
+$eventID = $_POST['eventID'];
+$startTime = $_POST['startTime'];
+$endTime = $_POST['endTime'];
+$description = $_POST['description'];
+$itemType = $_POST['itemType'];
 
-$sql = "INSERT INTO events (userID, eventID, startTime, endTime, description, itemType) VALUES ('$userID', '$eventID', '$startTime', '$endTime', '$description', 'itemType')"
+$event = json_decode($_POST, true);
+echo $_SESSION['username'];
 
-if ($conn->query($sql) === TRUE) {
+$userID = mysqli_query($link, "SELECT id FROM users WHERE username = '".$username."'");
+
+$sql = "INSERT INTO events (userID, eventID, startTime, endTime, description, itemType) VALUES ('".$userID."', '".$eventID."', '".$startTime."', '".$endTime."', '".$description."', '".$itemType."')";
+
+if ($link->query($sql) === TRUE) {
     echo "Page saved!";
 } else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
+    echo "Error: " . $sql . "<br>" . $link->error;
 }
-$conn->close();
+$link->close();
 
 ?>
