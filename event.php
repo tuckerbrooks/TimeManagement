@@ -1,4 +1,6 @@
 <?php
+require_once 'config.php';
+
 $myObj->itemID = 1;
 $myObj->startTime = time()*1000;
 $myObj->endTime = time()*1000 + 120000;

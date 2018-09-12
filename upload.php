@@ -11,10 +11,10 @@ $endTime = $_POST['endTime'];
 $description = $_POST['description'];
 $itemType = $_POST['itemType'];
 
-$event = json_decode($_POST, true);
 echo $_SESSION['username'];
 
-$userID = mysqli_query($link, "SELECT id FROM users WHERE username = '".$username."'");
+$getUserQuery = mysqli_query($link, "SELECT id FROM users WHERE username = '".$username."'");
+$userID = mysqli_fetch_object($getUserQuery)->id;
 
 $sql = "INSERT INTO events (userID, eventID, startTime, endTime, description, itemType) VALUES ('".$userID."', '".$eventID."', '".$startTime."', '".$endTime."', '".$description."', '".$itemType."')";
 

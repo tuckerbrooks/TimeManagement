@@ -47,7 +47,6 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 		<div class="topright">
 			<a href="logout.php">Logout</a>
 		</div>
-		<div id="erorTxtDIVNaYME"></div>
 		<center>
 			<h1>Today's Schedule</h1>
 		</center>
