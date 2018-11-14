@@ -5,7 +5,6 @@ ini_set('display_errors', '1');
 require_once 'config.php';
 
 $username = $_SESSION['username'];
-$eventID = $_POST['eventID'];
 $startTime = $_POST['startTime'];
 $endTime = $_POST['endTime'];
 $description = $_POST['description'];
@@ -16,7 +15,7 @@ echo $_SESSION['username'];
 $getUserQuery = mysqli_query($link, "SELECT id FROM users WHERE username = '".$username."'");
 $userID = mysqli_fetch_object($getUserQuery)->id;
 
-$sql = "INSERT INTO events (userID, eventID, startTime, endTime, description, itemType) VALUES ('".$userID."', '".$eventID."', '".$startTime."', '".$endTime."', '".$description."', '".$itemType."')";
+$sql = "INSERT INTO events (userID, startTime, endTime, description, itemType) VALUES ('".$userID."', '".$startTime."', '".$endTime."', '".$description."', '".$itemType."')";
 
 if ($link->query($sql) === TRUE) {
     echo "Page saved!";

@@ -338,19 +338,22 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 			},
 			created: function(){
 				var self = this;
-				$.get("event.php", function(data, status){
-					data = JSON.parse(data);
-					var item = {
-						itemID: data.itemID,
-						startTime: new Date(data.startTime),
-						endTime: new Date(data.endTime),
-						desc: data.desc,
-						itemType: data.itemType,
-					}
-					self.currentID = data.itemID;
-					self.events.push(item);
-					console.log(self.events[0]);
-    				self.printDate();
+				$.get("retrieve.php", function(data, status){
+					events = JSON.parse(data);
+					for (dataKey in events){
+						var data = events[dataKey];
+						var item = {
+							itemID: data.itemID,
+							startTime: new Date(parseInt(data.startTime)),
+							endTime: new Date(parseInt(data.endTime)),
+							desc: data.desc,
+							itemType: data.itemType,
+						}
+						self.currentID = data.itemID;
+						self.events.push(item);
+						console.log(self.events[0]);
+	    				self.printDate();
+	    			}
     				if (self.events.length > 0){
     					self.listItems();
     				}
