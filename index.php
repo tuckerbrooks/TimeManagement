@@ -15,12 +15,41 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 		<script src="https://unpkg.com/vue"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<style>
+			body {
+				background-color: #d0e3e8;
+			}
+			.date {
+				color: green;
+				font-family: Tahoma, Geneva, sans-serif;
+			}
+			.flexcontainer {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+			.app {
+				background-color: white;
+				width: 500px;
+				border-radius: 20px
+			}
+			.header {
+				align-items: center;
+				color: green;
+				text-align: center;
+				font-family: "Lucida Console", Monaco, monospace;
+				letter-spacing: 2px;
+			}
 			.eventType, .rNewEvent {
 				display: flex;
 				justify-content: center;
 				align-items: center;
 			}
 			.wrapper {
+				display: flex;
+				padding: 5px 20px;
+				border-bottom: 1px solid black;
+			}
+			.center {
 				display: flex;
 				justify-content: center;
 			}
@@ -47,229 +76,233 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 		<div class="topright">
 			<a href="logout.php">Logout</a>
 		</div>
-		<center>
-			<h1>Today's Schedule</h1>
-		</center>
-		<div id="app">
-			<div class="wrapper">
-				<button @click="goBack()"><</button>
-				<div>&nbsp;&nbsp;{{ this.dateText }}&nbsp;&nbsp;</div>
-				<button @click="goForward()">></button>
-			</div>
-			<p></p>
-			<div class="wrapper">
-				<div class="schedule-item">
-					<template v-for="item in todaysEvents">
-						<div>{{ item.startTime }}</div>
-						<div>{{ item.endTime }}</div>
-						<div>{{ item.desc }}</div>
-						<button @click="remove_item(item.itemID)">Delete</button>
-					</template>
+		<div class="header">
+			<h1>TIME MANAGEMENT</h1>
+		</div>
+		<div class=flexcontainer>
+			<div class="app" id="app">
+				<p></p>
+				<div class="center">
+					<button @click="goBack()"><</button>
+					<div class="date">&nbsp;&nbsp;{{ this.dateText }}&nbsp;&nbsp;</div>
+					<button @click="goForward()">></button>
 				</div>
-			</div>
-			<p></p>
-			<div class="eventType">
-				<select v-model="priority">
-					<option disabled value="">Please select one</option>
-					<option>Required Time</option>
-					<option>Flexible</option>
-					<option>Due Date</option>
-				</select>
-			</div>
-			<p></p>
-			<div class="rNewEvent" v-if="priority == 'Required Time'">
-				<div class="wrapper">
-					<div>Description: &nbsp;</div>
-					<input v-model="describe" placeholder="Description">
+				<p></p>
+				<div class="center">
+					<div class="schedule-item">
+						<template v-for="item in todaysEvents">
+							<div>{{ item.startTime }}</div>
+							<div>{{ item.endTime }}</div>
+							<div>{{ item.desc }}</div>
+							<button @click="remove_item(item.itemID)">Delete</button>
+						</template>
+					</div>
 				</div>
-				<div class="wrapper">
-					<div>Start Time: &nbsp;</div>
-					<select v-model="startHour">
-						<option disabled value=""></option>
-							<template v-for="n in 12">
-								<option>{{ n }}</option>
-							</template>
+				<p></p>
+				<div class="eventType">
+					<select v-model="priority">
+						<option disabled value="">Please select one</option>
+						<option>Required Time</option>
+						<option>Flexible</option>
+						<option>Due Date</option>
 					</select>
-					<div>&nbsp;:&nbsp;</div>
-					<select v-model="startMin">
-						<option disabled value=""></option>
-						<template v-for="n in 60">
-							<template v-if="n < 11">
-								<option>{{ '0' + (n - 1) }}</option>
+				</div>
+				<p></p>
+				<div class="rNewEvent" v-if="priority == 'Required Time'">
+					<div class="wrapper">
+						<div>Description: &nbsp;</div>
+						<input v-model="describe" placeholder="Description">
+					</div>
+					<div class="wrapper">
+						<div>Start Time: &nbsp;</div>
+						<select v-model="startHour">
+							<option disabled value=""></option>
+								<template v-for="n in 12">
+									<option>{{ n }}</option>
+								</template>
+						</select>
+						<div>&nbsp;:&nbsp;</div>
+						<select v-model="startMin">
+							<option disabled value=""></option>
+							<template v-for="n in 60">
+								<template v-if="n < 11">
+									<option>{{ '0' + (n - 1) }}</option>
+								</template>
+								<template v-else>
+									<option>{{ (n - 1) }}</option>
+								</template>
 							</template>
-							<template v-else>
+						</select>
+						<div>&nbsp;</div>
+						<select v-model="startMOA">
+							<option disabled value=""></option>
+							<option>AM</option>
+							<option>PM</option>
+						</select>
+					</div>
+					<div class="wrapper">
+						<div>Start Date: &nbsp;</div>
+						<select v-model="startMonth">
+							<option disabled value=""></option>
+							<template v-for="item in months">
+								<option>{{ item.name }}</option>
+							</template>
+						</select>
+						<div>&nbsp;</div>
+						<select v-model="startDay">
+							<option disabled value=""></option>
+							<template v-for="item in months">
+								<template v-if="item.name == startMonth">
+									<template v-for="n in item.days">
+										<option>{{ n }}</option>
+									</template>
+								</template>
+							</template>
+						</select>
+						<div>&nbsp;</div>
+						<select v-model="startYear">
+							<option disabled value=""></option>
+							<template v-for="n in 10">
+								<option>{{ date.getFullYear() + (n - 1) }}</option>
+							</template>
+						</select>
+					</div>
+					<div class="wrapper">
+						<div>End Time: &nbsp;</div>
+						<select v-model="endHour">
+							<option disabled value=""></option>
+								<template v-for="n in 12">
+									<option>{{ n }}</option>
+								</template>
+						</select>
+						<div>&nbsp;:&nbsp;</div>
+						<select v-model="endMin">
+							<option disabled value=""></option>
+							<template v-for="n in 60">
+								<template v-if="n < 11">
+									<option>{{ '0' + (n - 1) }}</option>
+								</template>
+								<template v-else>
+									<option>{{ (n - 1) }}</option>
+								</template>
+							</template>
+						</select>
+						<div>&nbsp;</div>
+						<select v-model="endMOA">
+							<option disabled value=""></option>
+							<option>AM</option>
+							<option>PM</option>
+						</select>
+					</div>
+					<div class="wrapper">
+						<div>End Date: &nbsp;</div>
+						<select v-model="endMonth">
+							<option disabled value=""></option>
+							<template v-for="item in months">
+								<option>{{ item.name }}</option>
+							</template>
+						</select>
+						<div>&nbsp;</div>
+						<select v-model="endDay">
+							<option disabled value=""></option>
+							<template v-for="item in months">
+								<template v-if="item.name == endMonth">
+									<template v-for="n in item.days">
+										<option>{{ n }}</option>
+									</template>
+								</template>
+							</template>
+						</select>
+						<div>&nbsp;</div>
+						<select v-model="endYear">
+							<option disabled value=""></option>
+							<template v-for="n in 10">
+								<option>{{ date.getFullYear() + (n - 1) }}</option>
+							</template>
+						</select>
+					</div>
+					<div class="center">
+						<button v-on:click="add_req()">Submit</button>
+					</div>
+				</div>
+				<div class="fNewEvent" v-if="priority == 'Flexible'">
+					<div class="wrapper">
+						<div>Description: &nbsp;</div>
+						<input v-model="describe" placeholder="Description">
+					</div>
+					<div class="wrapper">
+						<div>Hours: &nbsp;</div>
+						<select v-model="hours">
+							<template v-for="n in 13">
 								<option>{{ (n - 1) }}</option>
 							</template>
-						</template>
-					</select>
-					<div>&nbsp;</div>
-					<select v-model="startMOA">
-						<option disabled value=""></option>
-						<option>AM</option>
-						<option>PM</option>
-					</select>
-				</div>
-				<div class="wrapper">
-					<div>Start Date: &nbsp;</div>
-					<select v-model="startMonth">
-						<option disabled value=""></option>
-						<template v-for="item in months">
-							<option>{{ item.name }}</option>
-						</template>
-					</select>
-					<div>&nbsp;</div>
-					<select v-model="startDay">
-						<option disabled value=""></option>
-						<template v-for="item in months">
-							<template v-if="item.name == startMonth">
-								<template v-for="n in item.days">
-									<option>{{ n }}</option>
-								</template>
-							</template>
-						</template>
-					</select>
-					<div>&nbsp;</div>
-					<select v-model="startYear">
-						<option disabled value=""></option>
-						<template v-for="n in 10">
-							<option>{{ date.getFullYear() + (n - 1) }}</option>
-						</template>
-					</select>
-				</div>
-				<div class="wrapper">
-					<div>End Time: &nbsp;</div>
-					<select v-model="endHour">
-						<option disabled value=""></option>
-							<template v-for="n in 12">
-								<option>{{ n }}</option>
-							</template>
-					</select>
-					<div>&nbsp;:&nbsp;</div>
-					<select v-model="endMin">
-						<option disabled value=""></option>
-						<template v-for="n in 60">
-							<template v-if="n < 11">
-								<option>{{ '0' + (n - 1) }}</option>
-							</template>
-							<template v-else>
+						</select>
+					</div>
+					<div class="wrapper">
+						<div>Minutes: &nbsp;</div>
+						<select v-model="minutes">
+							<template v-for="n in 60">
 								<option>{{ (n - 1) }}</option>
 							</template>
-						</template>
-					</select>
-					<div>&nbsp;</div>
-					<select v-model="endMOA">
-						<option disabled value=""></option>
-						<option>AM</option>
-						<option>PM</option>
-					</select>
+						</select>
+					</div>
+					<div class="center">
+						<button v-on:click="add_flex()">Submit</button>
+					</div>
 				</div>
-				<div class="wrapper">
-					<div>End Date: &nbsp;</div>
-					<select v-model="endMonth">
-						<option disabled value=""></option>
-						<template v-for="item in months">
-							<option>{{ item.name }}</option>
-						</template>
-					</select>
-					<div>&nbsp;</div>
-					<select v-model="endDay">
-						<option disabled value=""></option>
-						<template v-for="item in months">
-							<template v-if="item.name == endMonth">
-								<template v-for="n in item.days">
-									<option>{{ n }}</option>
+				<div class="dNewEvent" v-if="priority == 'Due Date'">
+					<div class="wrapper">
+						<div>Description: &nbsp;</div>
+						<input v-model="describe" placeholder="Description">
+					</div>
+					<div class="wrapper">
+						<div>Due Date: &nbsp;</div>
+						<select v-model="dueMonth">
+							<option disabled value=""></option>
+							<template v-for="item in months">
+								<option>{{ item.name }}</option>
+							</template>
+						</select>
+						<div>&nbsp;</div>
+						<select v-model="dueDay">
+							<option disabled value=""></option>
+							<template v-for="item in months">
+								<template v-if="item.name == dueMonth">
+									<template v-for="n in item.days">
+										<option>{{ n }}</option>
+									</template>
 								</template>
 							</template>
-						</template>
-					</select>
-					<div>&nbsp;</div>
-					<select v-model="endYear">
-						<option disabled value=""></option>
-						<template v-for="n in 10">
-							<option>{{ date.getFullYear() + (n - 1) }}</option>
-						</template>
-					</select>
-				</div>
-				<div class="wrapper">
-					<button v-on:click="add_req()">Submit</button>
-				</div>
-			</div>
-			<div class="fNewEvent" v-if="priority == 'Flexible'">
-				<div class="wrapper">
-					<div>Description: &nbsp;</div>
-					<input v-model="describe" placeholder="Description">
-				</div>
-				<div class="wrapper">
-					<div>Hours: &nbsp;</div>
-					<select v-model="hours">
-						<template v-for="n in 13">
-							<option>{{ (n - 1) }}</option>
-						</template>
-					</select>
-				</div>
-				<div class="wrapper">
-					<div>Minutes: &nbsp;</div>
-					<select v-model="minutes">
-						<template v-for="n in 60">
-							<option>{{ (n - 1) }}</option>
-						</template>
-					</select>
-				</div>
-				<div class="wrapper">
-					<button v-on:click="add_flex()">Submit</button>
-				</div>
-			</div>
-			<div class="dNewEvent" v-if="priority == 'Due Date'">
-				<div class="wrapper">
-					<div>Description: &nbsp;</div>
-					<input v-model="describe" placeholder="Description">
-				</div>
-				<div class="wrapper">
-					<div>Due Date: &nbsp;</div>
-					<select v-model="dueMonth">
-						<option disabled value=""></option>
-						<template v-for="item in months">
-							<option>{{ item.name }}</option>
-						</template>
-					</select>
-					<div>&nbsp;</div>
-					<select v-model="dueDay">
-						<option disabled value=""></option>
-						<template v-for="item in months">
-							<template v-if="item.name == dueMonth">
-								<template v-for="n in item.days">
-									<option>{{ n }}</option>
-								</template>
+						</select>
+						<div>&nbsp;</div>
+						<select v-model="dueYear">
+							<option disabled value=""></option>
+							<template v-for="n in 10">
+								<option>{{ date.getFullYear() + (n - 1) }}</option>
 							</template>
-						</template>
-					</select>
-					<div>&nbsp;</div>
-					<select v-model="dueYear">
-						<option disabled value=""></option>
-						<template v-for="n in 10">
-							<option>{{ date.getFullYear() + (n - 1) }}</option>
-						</template>
-					</select>
+						</select>
+					</div>
+					<div class="wrapper">
+						<div>Hours: &nbsp;</div>
+						<select v-model="hours">
+							<template v-for="n in 13">
+								<option>{{ (n - 1) }}</option>
+							</template>
+						</select>
+					</div>
+					<div class="wrapper">
+						<div>Minutes: &nbsp;</div>
+						<select v-model="minutes">
+							<template v-for="n in 60">
+								<option>{{ (n - 1) }}</option>
+							</template>
+						</select>
+					</div>
+					<div class="center">
+						<button v-on:click="add_due()">Submit</button>
+					</div>
 				</div>
-				<div class="wrapper">
-					<div>Hours: &nbsp;</div>
-					<select v-model="hours">
-						<template v-for="n in 13">
-							<option>{{ (n - 1) }}</option>
-						</template>
-					</select>
-				</div>
-				<div class="wrapper">
-					<div>Minutes: &nbsp;</div>
-					<select v-model="minutes">
-						<template v-for="n in 60">
-							<option>{{ (n - 1) }}</option>
-						</template>
-					</select>
-				</div>
-				<div class="wrapper">
-					<button v-on:click="add_due()">Submit</button>
-				</div>
+				<p></p>
 			</div>
 		</div>
 	</body>
@@ -352,11 +385,11 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 						self.currentID = data.itemID;
 						self.events.push(item);
 						console.log(self.events[0]);
-	    				self.printDate();
 	    			}
     				if (self.events.length > 0){
     					self.listItems();
     				}
+    				self.printDate();
 				});
 			},
 			methods: {
